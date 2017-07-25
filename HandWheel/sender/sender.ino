@@ -1,4 +1,4 @@
-/* controls connection diagram:
+/* controls connectionsS:
  * X -> A0
  * Y -> A1
  * Z -> A2
@@ -9,6 +9,7 @@
  * STOP -> D4
  * encA -> D3
  * encB -> D2
+ * Note: X,Y,A,Z and x1,x10,x100 common pins connected through EN switch.
  */
 
 #include "Arduino.h"
@@ -22,7 +23,7 @@
  * SCK -> D13
  */
 RF24 radio (9, 10);
-const uint8_t address = 0xABCDEF;
+const uint8_t address[] = "CNC";
 volatile uint8_t data[2];
 
 void setup()
@@ -52,13 +53,13 @@ void setup()
 ISR(PCINT1_vect) {
 	// when a port C pin changes send the bytes
 	data[0] = PINC;
-	radio.write(data, 2);
+	radio.write((void*)data, 2);
 }
 
 ISR(PCINT2_vect) {
 	// when a port D pin changes send the bytes
 	data[1] = PIND;
-	radio.write(data, 2);
+	radio.write((void*)data, 2);
 }
 
 void loop()

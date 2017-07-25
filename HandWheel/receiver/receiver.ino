@@ -1,21 +1,21 @@
-/* DB15 connection diagram:
+/* DB15 connections:
  *
  * 1 -> 5V
  * 2 -> 5V
- * 3 ->
- * 4 ->
- * 5 ->
- * 6 ->
- * 7 ->
- * 8 ->
- * 9 ->
- * 10 ->
- * 11 ->
- * 12 ->
- * 13 ->
- * 14 ->
+ * 3 -> D3
+ * 4 -> D2
+ * 5 -> A0
+ * 6 -> A1
+ * 7 -> A2
+ * 8 -> A3
+ * 9 -> D7
+ * 10 -> D6
+ * 11 -> D5
+ * 12 -> GND
+ * 13 -> STOP optocoupler????
+ * 14 -> STOP optocoupler????
  * 15 -> GND
- *
+ * Note: optocoupler connected to D4 through 5V???
  */
 
 #include "Arduino.h"
@@ -29,7 +29,8 @@
  * SCK -> D13
  */
 RF24 radio (9, 10);
-const uint8_t address = 0xABCDEF;
+const uint8_t address[] = "CNC";
+uint8_t data[2];
 
 void setup()
 {
@@ -52,7 +53,6 @@ void setup()
 
 void loop()
 {
-	uint8_t data[2];
 	if (radio.available()) {
 		radio.read(data, 2);
 		PORTC = data[0];
