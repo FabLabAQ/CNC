@@ -3,7 +3,7 @@
  * Y -> A1
  * Z -> A2
  * A -> A3
- * STOP -> A4
+ * STOP -> A4  !!! NC to GND or to 5V?
  * x1 -> D7
  * x10 -> D6
  * x100 -> D5
@@ -30,10 +30,12 @@ uint8_t data[2];
 void setup()
 {
 	// set digital pins from D3 to D7 as inputs with pullups
+	 DDRD &= B00000111;
 	PORTD |= B11111000;
 	// turn on pin change interrupts on the same pins
 	PCMSK2 |= B11111000;
 	// set analog pins from A0 to A4 as inputs with pullups
+	 DDRC &= B11100000;
 	PORTC |= B00011111;
 	// turn on pin change interrupts on the same pins
 	PCMSK1 |= B00011111;
@@ -47,6 +49,7 @@ void setup()
 	radio.setChannel(50);
 	radio.setDataRate(RF24_2MBPS);
 	radio.setRetries(0, 1);
+	radio.setCRCLength(RF24_CRC_8);
 	radio.openWritingPipe(address);
 	radio.stopListening();
 }

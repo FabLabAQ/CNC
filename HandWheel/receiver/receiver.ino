@@ -44,6 +44,7 @@ void setup()
 	radio.setChannel(50);
 	radio.setDataRate(RF24_2MBPS);
 	radio.setRetries(0, 1);
+	radio.setCRCLength(RF24_CRC_8);
 	radio.maskIRQ(1, 1, 0);
 	radio.openReadingPipe(1, address);
 	radio.startListening();
