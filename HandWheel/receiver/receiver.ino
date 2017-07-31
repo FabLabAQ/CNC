@@ -2,8 +2,8 @@
  *
  * 1 -> 5V
  * 2 -> 5V
- * 3 -> D4
- * 4 -> D3
+ * 3 -> D1
+ * 4 -> D0
  * 5 -> A0
  * 6 -> A1
  * 7 -> A2
@@ -12,10 +12,10 @@
  * 10 -> D6
  * 11 -> D5
  * 12 -> GND
- * 13 -> STOP optocoupler????
- * 14 -> STOP optocoupler????
+ * 13 -> STOP optocoupler emitter
+ * 14 -> STOP optocoupler collector
  * 15 -> GND
- * Note: optocoupler connected to A4 through 5V???
+ * Note: optocoupler connected to D4 through 5V???
  */
 
 #include "Arduino.h"
@@ -31,14 +31,13 @@
  */
 RF24 radio (9, 10);
 const uint8_t address[] = "CNC";
-uint8_t data[2];
 
 void setup()
 {
 	// set digital pins from D3 to D7 as outputs
-	DDRD |= B11111000;
+	DDRD |= B11110011;
 	// set analog pins from A0 to A3 as outputs
-	DDRC |= B00011111;
+	DDRC |= B00001111;
 
 	radio.setAddressWidth(3);
 	radio.setChannel(50);
@@ -50,13 +49,19 @@ void setup()
 	radio.startListening();
 
 	pinMode(2, INPUT_PULLUP);
-	attachInterrupt(0, interrupt, FALLING);
+	attachInterrupt(0, interruptRoutine, FALLING);
 }
 
-void interrupt(){
-	radio.read(data, 2);
-	PORTC = data[0];
-	PORTD = data[1];
+void interruptRoutine(){
+	uint8_t data;
+	radio.read(data, 1);
+
+	if ( (data & B00001000) && (data & B00000100) ) {
+		PORTD = data;
+	}
+	else {
+		PORTC = data;
+	}
 }
 
 

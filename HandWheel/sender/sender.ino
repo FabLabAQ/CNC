@@ -3,12 +3,12 @@
  * Y -> A1
  * Z -> A2
  * A -> A3
- * STOP -> A4  !!! NC to GND or to 5V?
+ * STOP -> D4  !!! NC to GND or to 5V?
  * x1 -> D7
  * x10 -> D6
  * x100 -> D5
- * encA -> D4
- * encB -> D3
+ * encA -> D1
+ * encB -> D0
  * Note: X,Y,A,Z common pins connected through EN switch.
  */
 
@@ -21,24 +21,24 @@
  * MOSI -> D11
  * MISO -> D12
  * SCK -> D13
- * IRQ -> D2
+ * IRQ -> NC
  */
 RF24 radio (9, 10);
 const uint8_t address[] = "CNC";
-uint8_t data[2];
+//uint8_t data;
 
 void setup()
 {
-	// set digital pins from D3 to D7 as inputs with pullups
-	 DDRD &= B00000111;
-	PORTD |= B11111000;
+	// set digital pins from D0 to D7 as inputs with pullups
+	 DDRD = B00000000;
+	PORTD = B11111111;
+	// turn on pin change interrupts on pins D0, D1 and from D4 to D7
+	PCMSK2 = B11110011;
+	// set analog pins from A0 to A3 as inputs with pullups
+	 DDRC &= B11110000;
+	PORTC |= B00001111;
 	// turn on pin change interrupts on the same pins
-	PCMSK2 |= B11111000;
-	// set analog pins from A0 to A4 as inputs with pullups
-	 DDRC &= B11100000;
-	PORTC |= B00011111;
-	// turn on pin change interrupts on the same pins
-	PCMSK1 |= B00011111;
+	PCMSK1 |= B00001111;
 	// turn on pin change interrupt on ports C and D
 	PCICR |= B00000110;
 
@@ -56,14 +56,14 @@ void setup()
 
 ISR(PCINT1_vect) {
 	// when a port C pin changes send the bytes
-	data[0] = PINC;
-	radio.startWrite(data, 2, 0);
+	//data = PINC;
+	radio.startWrite(PINC, 1, 0);
 }
 
 ISR(PCINT2_vect) {
 	// when a port D pin changes send the bytes
-	data[1] = PIND;
-	radio.startWrite(data, 2, 0);
+	//data = PIND;
+	radio.startWrite(PIND, 1, 0);
 }
 
 void loop()
